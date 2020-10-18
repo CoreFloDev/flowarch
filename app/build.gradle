@@ -21,6 +21,10 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+            packagingOptions {
+                exclude "DebugProbesKt.bin"
+            }
         }
     }
     compileOptions {
@@ -32,9 +36,6 @@ android {
         freeCompilerArgs += [
                 "-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi",
                 "-Xuse-experimental=kotlinx.coroutines.ObsoleteCoroutinesApi"]
-    }
-    packagingOptions {
-        exclude "DebugProbesKt.bin"
     }
 }
 
