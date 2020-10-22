@@ -1,4 +1,4 @@
-package com.example.flow_arch.usecases
+package com.example.flow_arch.main.usecases
 
 sealed class Action {
     object InitialAction : Action()

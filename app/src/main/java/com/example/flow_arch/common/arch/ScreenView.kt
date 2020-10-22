@@ -1,4 +1,4 @@
-package com.example.flow_arch.arch
+package com.example.flow_arch.common.arch
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow

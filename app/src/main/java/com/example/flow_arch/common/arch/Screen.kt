@@ -1,18 +1,13 @@
-package com.example.flow_arch.arch
+package com.example.flow_arch.common.arch
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.*
 
 abstract class Screen<I : ScreenInput, O : ScreenOutput> {
 
-    private val scope: CoroutineScope = MainScope()
+    private val viewScope: CoroutineScope = MainScope()
+    protected val scope: CoroutineScope = MainScope()
 
     protected val input: Channel<I> = Channel()
     private val output by lazy { output() }
@@ -22,10 +17,10 @@ abstract class Screen<I : ScreenInput, O : ScreenOutput> {
     abstract fun terminate()
 
     fun attach(view: ScreenView<I, O>) {
+        println("coucou3 i reconnect")
         output
-            .flowOn(Dispatchers.Default)
             .onEach(view::render)
-            .launchIn(scope)
+            .launchIn(viewScope)
 
         view.inputs()
             .flowOn(Dispatchers.Default)
@@ -34,6 +29,6 @@ abstract class Screen<I : ScreenInput, O : ScreenOutput> {
     }
 
     fun detach() {
-        scope.cancel()
+        viewScope.cancel()
     }
 }
