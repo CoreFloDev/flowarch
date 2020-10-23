@@ -27,7 +27,6 @@ class MainScreen(
         .compose(convertResultToOutput(scope))
 
     override fun terminate() {
-        println("coucou terminated")
         scope.cancel()
     }
 

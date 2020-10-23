@@ -1,12 +1,17 @@
 package com.example.flow_arch.common.arch
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 abstract class Screen<I : ScreenInput, O : ScreenOutput> {
 
-    private val viewScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
+    private var viewScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
     protected val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
     protected val input: Channel<I> = Channel()
@@ -17,7 +22,7 @@ abstract class Screen<I : ScreenInput, O : ScreenOutput> {
     abstract fun terminate()
 
     fun attach(view: ScreenView<I, O>) {
-        println("coucou3 attach")
+        viewScope = CoroutineScope(Dispatchers.Main)
 
         output
             .onEach(view::render)
@@ -26,11 +31,10 @@ abstract class Screen<I : ScreenInput, O : ScreenOutput> {
         view.inputs()
             .flowOn(Dispatchers.Default)
             .onEach(input::send)
-            .launchIn(scope)
+            .launchIn(viewScope)
     }
 
     fun detach() {
-        println("coucou3 detach")
         viewScope.cancel()
     }
 }
