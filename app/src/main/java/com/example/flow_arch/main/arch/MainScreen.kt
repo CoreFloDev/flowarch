@@ -6,7 +6,6 @@ import com.example.flow_arch.main.usecases.IncrementNumberUseCase
 import com.example.flow_arch.main.usecases.InitialUseCase
 import com.example.flow_arch.main.usecases.Result
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.*
 
 class MainScreen(
@@ -26,10 +25,6 @@ class MainScreen(
         }
         .compose(convertResultToOutput(scope))
 
-    override fun terminate() {
-        scope.cancel()
-    }
-
     companion object {
         fun inputToAction() = FlowTransformer<MainInput, Action> { flow ->
             flow.map { input ->
@@ -45,9 +40,7 @@ class MainScreen(
                 listOf(
                     upsteam.filterIsInstance<Result.UiUpdate>()
                         .compose(reducingUiState())
-                        .onEach { println("coucou2 $it") }
-                        .stateIn(clear, SharingStarted.Eagerly, MainOutput.Display())
-                        .onEach { println("coucou passed $it") },
+                        .shareIn(clear, SharingStarted.Eagerly, 1),
                     upsteam.filterIsInstance<Result.Navigation>()
                         .compose(reducingNavigation())
                 ).merge()

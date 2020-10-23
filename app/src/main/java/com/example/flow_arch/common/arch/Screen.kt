@@ -19,7 +19,9 @@ abstract class Screen<I : ScreenInput, O : ScreenOutput> {
 
     protected abstract fun output(): Flow<O>
 
-    abstract fun terminate()
+    fun terminate() {
+        scope.cancel()
+    }
 
     fun attach(view: ScreenView<I, O>) {
         viewScope = CoroutineScope(Dispatchers.Main)
