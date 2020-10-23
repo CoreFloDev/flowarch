@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.map
 
 class IncrementNumberUseCase {
 
-    operator fun invoke() : FlowTransformer<Action.IncrementNumber, Result> = { flow ->
+    operator fun invoke() = FlowTransformer<Action.IncrementNumber, Result> { flow ->
         flow.map {
             Result.UiUpdate.IncrementNumber
         }

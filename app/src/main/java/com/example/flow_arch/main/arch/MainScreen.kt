@@ -24,19 +24,15 @@ class MainScreen(
             )
                 .merge()
         }
-        .onEach {
-            println("coucou2 $it")
-        }
-        .compose(convertResultToOutput(scope)).onEach {
-            println("coucou $it")
-        }
+        .compose(convertResultToOutput(scope))
 
     override fun terminate() {
+        println("coucou terminated")
         scope.cancel()
     }
 
     companion object {
-        fun inputToAction(): FlowTransformer<MainInput, Action> = { flow ->
+        fun inputToAction() = FlowTransformer<MainInput, Action> { flow ->
             flow.map { input ->
                 when (input) {
                     MainInput.Click -> Action.IncrementNumber as Action
@@ -44,27 +40,29 @@ class MainScreen(
             }.onStart { emit(Action.InitialAction) }
         }
 
-        fun convertResultToOutput(clear: CoroutineScope): FlowTransformer<Result, MainOutput> = { stream ->
-                val upsteam = stream.shareIn(clear, SharingStarted.Lazily)
+        fun convertResultToOutput(clear: CoroutineScope) = FlowTransformer<Result, MainOutput> { stream ->
+                val upsteam = stream.shareIn(clear, SharingStarted.Eagerly)
 
                 listOf(
                     upsteam.filterIsInstance<Result.UiUpdate>()
                         .compose(reducingUiState())
-                        .shareIn(clear, SharingStarted.Lazily, 1),
+                        .onEach { println("coucou2 $it") }
+                        .stateIn(clear, SharingStarted.Eagerly, MainOutput.Display())
+                        .onEach { println("coucou passed $it") },
                     upsteam.filterIsInstance<Result.Navigation>()
                         .compose(reducingNavigation())
                 ).merge()
             }
 
-        private fun reducingUiState(): FlowTransformer<Result.UiUpdate, MainOutput.Display> = { stream ->
+        private fun reducingUiState() = FlowTransformer<Result.UiUpdate, MainOutput.Display> { stream ->
                 stream.scan(MainOutput.Display()) { previous, new ->
                     when (new) {
                         Result.UiUpdate.IncrementNumber -> previous.copy(counter = previous.counter + 1)
                     }
-                }.drop(1)
+                }
             }
 
-        private fun reducingNavigation(): FlowTransformer<Result.Navigation, MainOutput> = { stream ->
+        private fun reducingNavigation() = FlowTransformer<Result.Navigation, MainOutput> { stream ->
             stream.map {output ->
                 when (output) {
                     Result.Navigation.MoveToNextPage -> MainOutput.OpenNextScreen
@@ -74,6 +72,6 @@ class MainScreen(
     }
 }
 
-typealias FlowTransformer<A, B> = (Flow<A>) -> Flow<B>
+fun interface FlowTransformer<A, B> : (Flow<A>) -> Flow<B>
 
 private fun <A, B> Flow<A>.compose(lambda: FlowTransformer<A, B>): Flow<B> = lambda(this)

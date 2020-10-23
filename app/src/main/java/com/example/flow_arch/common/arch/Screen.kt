@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.*
 
 abstract class Screen<I : ScreenInput, O : ScreenOutput> {
 
-    private val viewScope: CoroutineScope = MainScope()
-    protected val scope: CoroutineScope = MainScope()
+    private val viewScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
+    protected val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 
     protected val input: Channel<I> = Channel()
     private val output by lazy { output() }
@@ -17,7 +17,8 @@ abstract class Screen<I : ScreenInput, O : ScreenOutput> {
     abstract fun terminate()
 
     fun attach(view: ScreenView<I, O>) {
-        println("coucou3 i reconnect")
+        println("coucou3 attach")
+
         output
             .onEach(view::render)
             .launchIn(viewScope)
@@ -29,6 +30,7 @@ abstract class Screen<I : ScreenInput, O : ScreenOutput> {
     }
 
     fun detach() {
+        println("coucou3 detach")
         viewScope.cancel()
     }
 }
