@@ -5,6 +5,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +20,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 
 class MainActivity : AppCompatActivity(), ScreenView<MainInput, MainOutput> {
 
@@ -55,6 +57,10 @@ class MainActivity : AppCompatActivity(), ScreenView<MainInput, MainOutput> {
             is MainOutput.Display -> {
                 findViewById<TextView>(R.id.action_tv).text = output.counter.toString()
 
+                findViewById<Button>(R.id.movies_pb).isVisible = output.moviesState is MovieState.Loading
+                findViewById<TextView>(R.id.movies_retry_btn).isVisible = output.moviesState is MovieState.Retry
+                findViewById<RecyclerView>(R.id.movies_rv).isVisible = output.moviesState is MovieState.Display
+
                 if (output.moviesState is MovieState.Display) {
                     adapter.update(output.moviesState.list)
                 } else Unit
@@ -62,6 +68,8 @@ class MainActivity : AppCompatActivity(), ScreenView<MainInput, MainOutput> {
             MainOutput.OpenNextScreen -> Unit //TODO
         }
 
-    override fun inputs(): Flow<MainInput> =
-        findViewById<Button>(R.id.action_btn).clicks().map { MainInput.Click }
+    override fun inputs(): Flow<MainInput> = listOf(
+        findViewById<Button>(R.id.action_btn).clicks().map { MainInput.Click },
+        findViewById<Button>(R.id.movies_retry_btn).clicks().map { MainInput.RetryClicked }
+    ).merge()
 }

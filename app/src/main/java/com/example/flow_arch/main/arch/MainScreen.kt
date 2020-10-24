@@ -30,7 +30,8 @@ class MainScreen(
         fun inputToAction() = FlowTransformer<MainInput, Action> { flow ->
             flow.map { input ->
                 when (input) {
-                    MainInput.Click -> Action.IncrementNumber as Action
+                    MainInput.Click -> Action.IncrementNumber
+                    MainInput.RetryClicked -> Action.InitialAction
                 }
             }.onStart {
                 emit(Action.InitialAction)
@@ -38,13 +39,13 @@ class MainScreen(
         }
 
         fun convertResultToOutput(clear: CoroutineScope) = FlowTransformer<Result, MainOutput> { stream ->
-                val upsteam = stream.shareIn(clear, SharingStarted.Eagerly)
+                val upstream = stream.shareIn(clear, SharingStarted.Lazily)
 
                 listOf(
-                    upsteam.filterIsInstance<Result.UiUpdate>()
+                    upstream.filterIsInstance<Result.UiUpdate>()
                         .compose(reducingUiState())
-                        .shareIn(clear, SharingStarted.Eagerly, 1),
-                    upsteam.filterIsInstance<Result.Navigation>()
+                        .shareIn(clear, SharingStarted.Lazily, 1),
+                    upstream.filterIsInstance<Result.Navigation>()
                         .compose(reducingNavigation())
                 ).merge()
             }
