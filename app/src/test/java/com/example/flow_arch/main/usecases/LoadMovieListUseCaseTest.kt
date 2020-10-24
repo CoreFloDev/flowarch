@@ -7,9 +7,9 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import kotlin.time.ExperimentalTime
 
-class InitialUseCaseTest {
+class LoadMovieListUseCaseTest {
 
-    private val useCase = InitialUseCase()
+    private val useCase = LoadMovieListUseCase()
 
     @ExperimentalTime
     @Test

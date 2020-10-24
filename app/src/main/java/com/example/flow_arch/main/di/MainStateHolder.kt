@@ -2,6 +2,7 @@ package com.example.flow_arch.main.di
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import com.example.flow_arch.common.FlowApp
 import com.example.flow_arch.common.arch.Screen
 import com.example.flow_arch.main.arch.MainInput
 import com.example.flow_arch.main.arch.MainOutput
@@ -14,6 +15,7 @@ class MainStateHolder(app: Application): AndroidViewModel(app) {
 
     init {
         DaggerMainComponent.builder()
+            .appComponent(FlowApp.appComponent(app))
             .build()
             .inject(this)
     }
