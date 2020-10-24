@@ -16,8 +16,6 @@ class LoadMovieListUseCase(
                 }
                 .catch { Result.UiUpdate.MovieList.Error }
                 .onStart { emit(Result.UiUpdate.MovieList.Loading) }
-        }.onEach {
-            println("coucou $it")
         }
     }
 }
