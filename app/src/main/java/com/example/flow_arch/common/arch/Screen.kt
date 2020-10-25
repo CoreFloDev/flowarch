@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.*
 abstract class Screen<I : ScreenInput, O : ScreenOutput> {
 
     private var viewScope: CoroutineScope = CoroutineScope(Dispatchers.Main)
-    protected val scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    protected val scope: CoroutineScope = CoroutineScope(Dispatchers.Default)
 
     protected val input: Channel<I> = Channel()
     private val output by lazy { output() }
