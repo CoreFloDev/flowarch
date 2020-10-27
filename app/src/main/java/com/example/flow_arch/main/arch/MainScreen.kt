@@ -6,6 +6,7 @@ import com.example.flow_arch.main.usecases.IncrementCounterUseCase
 import com.example.flow_arch.main.usecases.LoadMovieListUseCase
 import com.example.flow_arch.main.usecases.Result
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 
 class MainScreen(
@@ -16,6 +17,7 @@ class MainScreen(
     override fun output(): Flow<MainOutput> = input.receiveAsFlow()
         .compose(inputToAction())
         .compose { stream ->
+            println("coucou2")
             val upstream = stream.shareIn(scope, SharingStarted.Lazily)
 
             listOf(
@@ -34,6 +36,7 @@ class MainScreen(
                     MainInput.RetryClicked -> Action.InitialAction
                 }
             }.onStart {
+                delay(10)
                 emit(Action.InitialAction)
             }
         }

@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.*
 
 class LoadMovieListUseCase(
     private val movieRepository: MovieRepository
-) {
+) : UseCase<Action.InitialAction> {
 
-    operator fun invoke() = FlowTransformer<Action.InitialAction, Result> { flow ->
+    override operator fun invoke() = FlowTransformer<Action.InitialAction, Result> { flow ->
         flow.flatMapLatest {
             movieRepository.getMovieList()
                 .onEach { println("coucou ${Thread.currentThread().name}") }
