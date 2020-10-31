@@ -6,12 +6,11 @@ import kotlinx.coroutines.flow.*
 
 class LoadMovieListUseCase(
     private val movieRepository: MovieRepository
-) : UseCase<Action.InitialAction> {
+) {
 
-    override operator fun invoke() = FlowTransformer<Action.InitialAction, Result> { flow ->
+    operator fun invoke() : (Flow<Action.InitialAction>) -> Flow<Result> = { flow ->
         flow.flatMapLatest {
             movieRepository.getMovieList()
-                .onEach { println("coucou ${Thread.currentThread().name}") }
                 .map { Result.UiUpdate.MovieList.Display(it) as Result }
                 .catch { emit(Result.UiUpdate.MovieList.Error) }
                 .onStart { emit(Result.UiUpdate.MovieList.Loading) }

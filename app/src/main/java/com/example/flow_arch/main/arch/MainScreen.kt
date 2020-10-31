@@ -15,18 +15,17 @@ class MainScreen(
 ) : Screen<MainInput, MainOutput>() {
 
     override fun output(): Flow<MainOutput> = input.receiveAsFlow()
-        .compose(inputToAction())
-        .compose { stream ->
-            println("coucou2")
+        .let(inputToAction())
+        .let { stream ->
             val upstream = stream.shareIn(scope, SharingStarted.Lazily)
 
             listOf(
-                upstream.filterIsInstance<Action.InitialAction>().compose(loadMovieListUseCase()),
-                upstream.filterIsInstance<Action.IncrementNumber>().compose(incrementCounterUseCase())
+                upstream.filterIsInstance<Action.InitialAction>().let(loadMovieListUseCase()),
+                upstream.filterIsInstance<Action.IncrementNumber>().let(incrementCounterUseCase())
             )
                 .merge()
         }
-        .compose(convertResultToOutput(scope))
+        .let(convertResultToOutput(scope))
 
     companion object {
         fun inputToAction() = FlowTransformer<MainInput, Action> { flow ->
@@ -46,10 +45,10 @@ class MainScreen(
 
                 listOf(
                     upstream.filterIsInstance<Result.UiUpdate>()
-                        .compose(reducingUiState())
+                        .let(reducingUiState())
                         .shareIn(clear, SharingStarted.Lazily, 1),
                     upstream.filterIsInstance<Result.Navigation>()
-                        .compose(reducingNavigation())
+                        .let(reducingNavigation())
                 ).merge()
             }
 
@@ -77,5 +76,3 @@ class MainScreen(
 }
 
 fun interface FlowTransformer<A, B> : (Flow<A>) -> Flow<B>
-
-private fun <A, B> Flow<A>.compose(lambda: FlowTransformer<A, B>): Flow<B> = this.let(lambda)
