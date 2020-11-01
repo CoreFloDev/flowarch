@@ -1,7 +1,7 @@
 package com.example.flow_arch.common.network
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import retrofit2.http.GET
 
 interface MovieApi {
@@ -10,14 +10,22 @@ interface MovieApi {
     suspend fun getMovieList(): ResultList
 }
 
-@JsonClass(generateAdapter = true)
+//class MovieApiImplementation(
+//    private val client: HttpClient
+//): MovieApi {
+//    override suspend fun getMovieList(): ResultList {
+//        return client.get("https://api.themoviedb.org/3/movie/top_rated?api_key=06c477fb6235927e8e8ea7e96b18133c")
+//    }
+//}
+
+@Serializable
 data class ResultList(
-    @Json(name = "results") val result: List<Movie> = emptyList()
+    @SerialName("results") val result: List<Movie> = emptyList()
 )
 
-@JsonClass(generateAdapter = true)
+@Serializable
 data class Movie(
-    @Json(name = "overview") val overview: String,
-    @Json(name = "poster_path") val image: String,
-    @Json(name = "title") val title: String
+    @SerialName("overview") val overview: String,
+    @SerialName("poster_path") val image: String,
+    @SerialName( "title") val title: String
 )
