@@ -25,7 +25,9 @@ import kotlinx.coroutines.flow.merge
 class MainActivity : AppCompatActivity(), ScreenView<MainInput, MainOutput> {
 
     private lateinit var screen: Screen<MainInput, MainOutput>
-    private val adapter = MovieAdapter()
+    private val adapter = MovieAdapter().apply {
+        stateRestorationPolicy = RecyclerView.Adapter.StateRestorationPolicy.PREVENT_WHEN_EMPTY
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
