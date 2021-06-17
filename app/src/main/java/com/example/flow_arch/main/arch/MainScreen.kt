@@ -1,13 +1,21 @@
 package com.example.flow_arch.main.arch
 
+import com.example.flow_arch.common.arch.FlowTransformer
 import com.example.flow_arch.common.arch.Screen
 import com.example.flow_arch.main.usecases.Action
 import com.example.flow_arch.main.usecases.IncrementCounterUseCase
 import com.example.flow_arch.main.usecases.LoadMovieListUseCase
 import com.example.flow_arch.main.usecases.Result
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.shareIn
 
 class MainScreen(
     private val incrementCounterUseCase: IncrementCounterUseCase,
@@ -34,9 +42,8 @@ class MainScreen(
                     MainInput.Click -> Action.IncrementNumber
                     MainInput.RetryClicked -> Action.InitialAction
                 }
-            }.onStart {
-                emit(Action.InitialAction)
             }
+                .onStart { emit(Action.InitialAction) }
         }
 
         fun convertResultToOutput(clear: CoroutineScope) = FlowTransformer<Result, MainOutput> { stream ->
@@ -73,5 +80,3 @@ class MainScreen(
         }
     }
 }
-
-fun interface FlowTransformer<A, B> : (Flow<A>) -> Flow<B>

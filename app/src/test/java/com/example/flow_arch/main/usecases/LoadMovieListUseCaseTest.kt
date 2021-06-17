@@ -5,7 +5,6 @@ import com.example.flow_arch.common.network.Movie
 import com.example.flow_arch.common.repo.MovieRepository
 import io.mockk.every
 import io.mockk.mockk
-import java.lang.Exception
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -29,7 +28,17 @@ class LoadMovieListUseCaseTest {
                 .let(useCase())
                 .test {
                     assertEquals(Result.UiUpdate.MovieList.Loading, expectItem())
-                    assertEquals(Result.UiUpdate.MovieList.Display(listOf(Movie(OVERVIEW, IMAGE, TITLE))), expectItem())
+                    assertEquals(
+                        Result.UiUpdate.MovieList.Display(
+                            listOf(
+                                Movie(
+                                    OVERVIEW,
+                                    IMAGE,
+                                    TITLE
+                                )
+                            )
+                        ), expectItem()
+                    )
                     expectComplete()
                 }
         }

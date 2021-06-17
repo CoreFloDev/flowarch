@@ -1,7 +1,6 @@
 package com.example.flow_arch.main.ui
 
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -15,10 +14,9 @@ import com.example.flow_arch.R
 import com.example.flow_arch.common.arch.Screen
 import com.example.flow_arch.common.arch.ScreenView
 import com.example.flow_arch.main.arch.MovieState
+import com.example.flow_arch.common.arch.clicks
 import com.example.flow_arch.main.di.MainStateHolder
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 
@@ -47,11 +45,6 @@ class MainActivity : AppCompatActivity(), ScreenView<MainInput, MainOutput> {
     override fun onDestroy() {
         screen.detach()
         super.onDestroy()
-    }
-
-    fun View.clicks(): Flow<Unit> = callbackFlow {
-        setOnClickListener { offer(Unit) }
-        awaitClose { setOnClickListener(null) }
     }
 
     override fun render(output: MainOutput) =
