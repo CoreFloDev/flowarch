@@ -1,17 +1,15 @@
 package com.example.flow_arch.common.ui
 
-import android.content.Context
-import android.util.AttributeSet
-import androidx.appcompat.widget.AppCompatImageView
-import coil.load as coilLoad
+import androidx.compose.foundation.Image
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import coil.compose.rememberImagePainter
 
-class NetworkImageView @JvmOverloads constructor(
-    context: Context,
-    attr: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : AppCompatImageView(context, attr, defStyleAttr) {
-
-    fun load(url: String) {
-        coilLoad(url)
-    }
+@Composable
+fun LoadImage(url: String, modifier: Modifier = Modifier) {
+    Image(
+        painter = rememberImagePainter(url),
+        contentDescription = null,
+        modifier = modifier
+    )
 }
