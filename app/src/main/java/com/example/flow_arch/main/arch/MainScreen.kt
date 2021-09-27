@@ -26,7 +26,7 @@ class MainScreen(
     override fun output(): Flow<MainOutput> = input.receiveAsFlow()
         .let(inputToAction())
         .let { stream ->
-            val upstream = stream.shareIn(scope, SharingStarted.Eagerly)
+            val upstream = stream.shareIn(scope, SharingStarted.Lazily)
 
             listOf(
                 upstream.filterIsInstance<Action.InitialAction>().let(loadMovieListUseCase()),
