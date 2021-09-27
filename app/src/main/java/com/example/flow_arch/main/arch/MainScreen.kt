@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
@@ -25,7 +26,7 @@ class MainScreen(
     override fun output(): Flow<MainOutput> = input.receiveAsFlow()
         .let(inputToAction())
         .let { stream ->
-            val upstream = stream.shareIn(scope, SharingStarted.Eagerly, 1)
+            val upstream = stream.shareIn(scope, SharingStarted.Eagerly)
 
             listOf(
                 upstream.filterIsInstance<Action.InitialAction>().let(loadMovieListUseCase()),
@@ -37,13 +38,13 @@ class MainScreen(
 
     companion object {
         fun inputToAction() = FlowTransformer<MainInput, Action> { flow ->
-            flow.map { input ->
+            merge(flowOf(Action.InitialAction),
+                flow.map { input ->
                 when (input) {
                     MainInput.Click -> Action.IncrementNumber
                     MainInput.RetryClicked -> Action.InitialAction
                 }
-            }
-                .onStart { emit(Action.InitialAction) }
+            })
         }
 
         fun convertResultToOutput(clear: CoroutineScope) = FlowTransformer<Result, MainOutput> { stream ->
