@@ -18,8 +18,8 @@ class IncrementCounterUseCaseTest {
             flowOf(Action.IncrementNumber)
                 .let(useCase())
                 .test {
-                    assertEquals(Result.UiUpdate.IncrementNumber, expectItem())
-                    expectComplete()
+                    assertEquals(Result.UiUpdate.IncrementNumber, awaitItem())
+                    awaitComplete()
                 }
         }
     }
