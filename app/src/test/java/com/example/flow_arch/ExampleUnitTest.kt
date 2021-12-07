@@ -14,7 +14,7 @@ class ExampleUnitTest {
         val channel = Channel<String>()
 
         channel.receiveAsFlow()
-            .map { State.Content(it) as State }
+            .map<String, State> { State.Content(it) }
             .catch { emit(State.Error) }
             .onStart { emit(State.Loading) }
     }

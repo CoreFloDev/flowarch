@@ -32,7 +32,7 @@
 }
 
 # Change here com.yourcompany.yourpackage
--keep,includedescriptorclasses class com.yourcompany.yourpackage.**$$serializer { *; } # <-- change package name to your app's
+-keep,includedescriptorclasses class com.example.flow_arch.common.network.**$$serializer { *; } # <-- change package name to your app's
 -keepclassmembers class com.example.flow_arch.common.network** { # <-- change package name to your app's
     *** Companion;
 }
