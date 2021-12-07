@@ -32,6 +32,7 @@ import com.example.flow_arch.main.arch.MovieState
 import com.example.flow_arch.main.di.MainStateHolder
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -41,7 +42,7 @@ class MainActivity : ComponentActivity(), ScreenView<MainInput, MainOutput> {
     private lateinit var screen: Screen<MainInput, MainOutput>
 
     private val viewChannel = Channel<MainOutput.Display>()
-    private val inputChannel = Channel<MainInput>()
+    private val inputChannel = MutableSharedFlow<MainInput>(extraBufferCapacity = 1)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,9 +65,7 @@ class MainActivity : ComponentActivity(), ScreenView<MainInput, MainOutput> {
                                     .padding(vertical = 4.dp)
                             ) {
                                 Button(onClick = {
-                                    runBlocking {
-                                        inputChannel.send(MainInput.Click)
-                                    }
+                                        inputChannel.tryEmit(MainInput.Click)
                                 }) {
                                     Text(text = "hello world!".uppercase())
                                 }
@@ -101,9 +100,7 @@ class MainActivity : ComponentActivity(), ScreenView<MainInput, MainOutput> {
                                 }
                                 MovieState.Retry -> {
                                     Button(onClick = {
-                                        runBlocking {
-                                            inputChannel.send(MainInput.RetryClicked)
-                                        }
+                                        inputChannel.tryEmit(MainInput.RetryClicked)
                                     }) {
                                         Text(text = "RETRY")
                                     }
@@ -138,23 +135,10 @@ class MainActivity : ComponentActivity(), ScreenView<MainInput, MainOutput> {
                         viewChannel.send(output)
                     }
                 }
-
-//                findViewById<TextView>(R.id.action_tv).text = output.counter.toString()
-//
-//                findViewById<Button>(R.id.movies_pb).isVisible = output.moviesState is MovieState.Loading
-//                findViewById<TextView>(R.id.movies_retry_btn).isVisible = output.moviesState is MovieState.Retry
-//                findViewById<RecyclerView>(R.id.movies_rv).isVisible = output.moviesState is MovieState.Display
-
-                if (output.moviesState is MovieState.Display) {
-                    // adapter.update(output.moviesState.list)
-                } else Unit
+                Unit
             }
             MainOutput.OpenNextScreen -> Unit //TODO
         }
 
-    override fun inputs(): Flow<MainInput> = inputChannel.consumeAsFlow()
-//        listOf(
-//        findViewById<Button>(R.id.action_btn).clicks().map { MainInput.Click },
-//        findViewById<Button>(R.id.movies_retry_btn).clicks().map { MainInput.RetryClicked }
-//    ).merge()
+    override fun inputs(): Flow<MainInput> = inputChannel
 }
