@@ -3,16 +3,21 @@ package com.example.flow_arch.main.ui
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.BadgedBox
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Button
@@ -32,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModelProvider
 import com.example.flow_arch.common.arch.Screen
 import com.example.flow_arch.common.arch.ScreenView
@@ -84,19 +90,80 @@ class MainActivity : ComponentActivity(), ScreenView<MainInput, MainOutput> {
                             },
                             bottomBar = {
                                 BottomNavigation(backgroundColor = Color.White) {
-                                    BottomNavigationItem(selected = false, onClick = { }, icon = { Icon(imageVector = Icons.Filled.Place, contentDescription = "test") }, label = {
-                                        Text(text = "test")
-                                    })
-                                    BottomNavigationItem(selected = true, onClick = { }, icon = { Icon(imageVector = Icons.Filled.Email, contentDescription = "test2") }, label = {
-                                        Text(text = "test2")
-                                    })
-                                    BottomNavigationItem(selected = false, onClick = { }, icon = { Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "test3") }, label = {
-                                        Text(text = "test3")
-                                    })
-                                    BottomNavigationItem(selected = false, onClick = { }, icon = { Icon(imageVector = Icons.Filled.AccountCircle, contentDescription = "test4") }, label = {
-                                        Text(text = "test4")
-                                    })
-                                    BottomNavigationItem(selected = false, onClick = { }, icon = { Icon(imageVector = Icons.Filled.ShoppingCart, contentDescription = "test5") }, label = {
+                                    BottomNavigationItem(
+                                        selected = false,
+                                        onClick = { },
+                                        icon = {
+                                            Icon(
+                                                imageVector = Icons.Filled.Place,
+                                                contentDescription = "test"
+                                            )
+                                        },
+                                        label = {
+                                            Text(text = "test")
+                                        })
+                                    BottomNavigationItem(
+                                        selected = true,
+                                        onClick = { },
+                                        icon = {
+                                            Icon(
+                                                imageVector = Icons.Filled.Email,
+                                                contentDescription = "test2"
+                                            )
+                                        },
+                                        label = {
+                                            Text(text = "test2")
+                                        })
+                                    BottomNavigationItem(
+                                        selected = false,
+                                        onClick = { },
+                                        icon = {
+                                            Icon(
+                                                imageVector = Icons.Filled.AccountCircle,
+                                                contentDescription = "test3"
+                                            )
+                                        },
+                                        label = {
+                                            Text(text = "test3")
+                                        })
+                                    BottomNavigationItem(
+                                        selected = false,
+                                        onClick = { },
+                                        icon = {
+                                            Icon(
+                                                imageVector = Icons.Filled.AccountCircle,
+                                                contentDescription = "test4"
+                                            )
+                                        },
+                                        label = {
+                                            Text(text = "test4")
+                                        })
+                                    BottomNavigationItem(selected = false, onClick = { }, icon = {
+                                        BadgedBox(badge = {
+                                            Text(
+                                                text = "20",
+                                                fontSize = 10.sp,
+                                                color = Color.White,
+                                                modifier = Modifier
+                                                    .background(Color.Red, shape = CircleShape)
+                                                    .padding(start = 4.dp, end = 4.dp)
+                                            )
+//                                            CircularProgressIndicator(modifier = Modifier
+//                                                .background(Color.Red, shape = CircleShape)
+//                                                .padding(4.dp)
+//                                                .width(8.dp)
+//                                                .height(8.dp),
+//                                                strokeWidth = 1.dp,
+//                                                color = Color.White
+//                                            )
+                                        }) {
+                                            Icon(
+                                                imageVector = Icons.Filled.ShoppingCart,
+                                                contentDescription = "test5"
+                                            )
+                                        }
+
+                                    }, label = {
                                         Text(text = "£45.56")
                                     })
                                 }
@@ -157,7 +224,8 @@ fun Content(output: MainOutput.Display, inputChannel: MutableSharedFlow<MainInpu
             MovieState.Loading -> {
                 Box(
                     contentAlignment = Alignment.Center,
-                    modifier = Modifier.fillMaxSize() ) {
+                    modifier = Modifier.fillMaxSize()
+                ) {
                     CircularProgressIndicator()
                 }
             }
