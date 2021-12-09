@@ -28,7 +28,7 @@ class MainScreen(
             val upstream = stream.shareIn(scope, SharingStarted.Eagerly, 1)
 
             listOf(
-                upstream.filterIsInstance<Action.InitialAction>().let(loadMovieListUseCase()),
+                upstream.filterIsInstance<Action.LoadPage>().let(loadMovieListUseCase()),
                 upstream.filterIsInstance<Action.IncrementNumber>().let(incrementCounterUseCase())
             )
                 .merge()
@@ -40,10 +40,11 @@ class MainScreen(
             flow.map { input ->
                 when (input) {
                     MainInput.Click -> Action.IncrementNumber
-                    MainInput.RetryClicked -> Action.InitialAction
+                    MainInput.RetryClicked -> Action.LoadPage(1)
+                    is MainInput.LoadNextPage -> Action.LoadPage(input.page)
                 }
             }
-                .onStart { emit(Action.InitialAction) }
+                .onStart { emit(Action.LoadPage(1)) }
         }
 
         fun convertResultToOutput(clear: CoroutineScope) = FlowTransformer<Result, MainOutput> { stream ->

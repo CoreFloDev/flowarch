@@ -6,4 +6,6 @@ sealed class MainInput: ScreenInput {
     object Click : MainInput()
 
     object RetryClicked : MainInput()
+
+    data class LoadNextPage(val page: Int) : MainInput()
 }

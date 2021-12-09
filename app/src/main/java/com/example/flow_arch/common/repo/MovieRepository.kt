@@ -9,8 +9,8 @@ class MovieRepository(
     private val movieApi: MovieApi
 ) {
 
-    fun getMovieList(): Flow<List<Movie>> = flow {
-        emit(movieApi.getMovieList().result.map {
+    fun getMovieList(page: Int): Flow<List<Movie>> = flow {
+        emit(movieApi.getMovieList(page).result.map {
             it.copy(image = "https://image.tmdb.org/t/p/w200/" + it.image)
         })
     }

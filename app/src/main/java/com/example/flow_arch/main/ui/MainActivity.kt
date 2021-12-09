@@ -48,6 +48,7 @@ import com.example.flow_arch.common.ui.theme.FlowArchTheme
 import com.example.flow_arch.main.arch.MainInput
 import com.example.flow_arch.main.arch.MainOutput
 import com.example.flow_arch.main.arch.MovieState
+import com.example.flow_arch.main.arch.Movies
 import com.example.flow_arch.main.di.MainStateHolder
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
@@ -252,24 +253,37 @@ fun Content(output: MainOutput.Display, inputChannel: MutableSharedFlow<MainInpu
             is MovieState.Display -> {
                 LazyColumn {
                     items(current.list) { movie ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(bottom = 32.dp)
-                        ) {
-                            LoadImage(
-                                url = movie.image,
-                                modifier = Modifier.requiredSize(150.dp)
-                            )
-                            Column {
-                                Text(
-                                    text = movie.title,
-                                    modifier = Modifier.padding(vertical = 4.dp),
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(text = movie.overview)
-                            }
+                        when (movie) {
+                            is Movies.Display -> {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 32.dp)
+                                ) {
+                                    LoadImage(
+                                        url = movie.movie.image,
+                                        modifier = Modifier.requiredSize(150.dp)
+                                    )
+                                    Column {
+                                        Text(
+                                            text = movie.movie.title,
+                                            modifier = Modifier.padding(vertical = 4.dp),
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                        Text(text = movie.movie.overview)
+                                    }
 
+                                }
+                            }
+                            is Movies.Loading -> {
+                                Box(
+                                    contentAlignment = Alignment.Center,
+                                    modifier = Modifier.fillMaxSize()
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                                inputChannel.tryEmit(MainInput.LoadNextPage(movie.page))
+                            }
                         }
                     }
                 }

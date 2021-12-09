@@ -15,5 +15,10 @@ sealed class MainOutput: ScreenOutput {
 sealed class MovieState {
     object Retry: MovieState()
     object Loading: MovieState()
-    data class Display(val list: List<Movie>) : MovieState()
+    data class Display(val list: List<Movies>) : MovieState()
+}
+
+sealed class Movies {
+    data class Display(val movie: Movie) : Movies()
+    data class Loading(val page: Int) : Movies()
 }
