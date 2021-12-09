@@ -8,7 +8,8 @@ import io.mockk.mockk
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -20,44 +21,40 @@ class LoadMovieListUseCaseTest {
 
     @ExperimentalTime
     @Test
-    fun `test nominal case`() {
+    fun `test nominal case`() = TestScope().runTest {
         every { movieRepo.getMovieList() } returns flowOf(listOf(Movie(OVERVIEW, IMAGE, TITLE)))
 
-        runBlockingTest {
-            flowOf(Action.InitialAction)
-                .let(useCase())
-                .test {
-                    assertEquals(Result.UiUpdate.MovieList.Loading, expectItem())
-                    assertEquals(
-                        Result.UiUpdate.MovieList.Display(
-                            listOf(
-                                Movie(
-                                    OVERVIEW,
-                                    IMAGE,
-                                    TITLE
-                                )
+        flowOf(Action.InitialAction)
+            .let(useCase())
+            .test {
+                assertEquals(Result.UiUpdate.MovieList.Loading, awaitItem())
+                assertEquals(
+                    Result.UiUpdate.MovieList.Display(
+                        listOf(
+                            Movie(
+                                OVERVIEW,
+                                IMAGE,
+                                TITLE
                             )
-                        ), expectItem()
-                    )
-                    expectComplete()
-                }
-        }
+                        )
+                    ), awaitItem()
+                )
+                awaitComplete()
+            }
     }
 
     @ExperimentalTime
     @Test
-    fun `test error case`() {
+    fun `test error case`() = TestScope().runTest {
         every { movieRepo.getMovieList() } returns flow { throw Exception() }
 
-        runBlockingTest {
-            flowOf(Action.InitialAction)
-                .let(useCase())
-                .test {
-                    assertEquals(Result.UiUpdate.MovieList.Loading, expectItem())
-                    assertEquals(Result.UiUpdate.MovieList.Error, expectItem())
-                    expectComplete()
-                }
-        }
+        flowOf(Action.InitialAction)
+            .let(useCase())
+            .test {
+                assertEquals(Result.UiUpdate.MovieList.Loading, awaitItem())
+                assertEquals(Result.UiUpdate.MovieList.Error, awaitItem())
+                awaitComplete()
+            }
     }
 
     companion object {

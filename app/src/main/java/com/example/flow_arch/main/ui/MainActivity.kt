@@ -10,10 +10,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -24,6 +22,9 @@ import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
+import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
@@ -32,6 +33,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Place
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,8 +49,14 @@ import com.example.flow_arch.main.arch.MainInput
 import com.example.flow_arch.main.arch.MainOutput
 import com.example.flow_arch.main.arch.MovieState
 import com.example.flow_arch.main.di.MainStateHolder
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.HorizontalPagerIndicator
+import com.google.accompanist.pager.pagerTabIndicatorOffset
+import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity(), ScreenView<MainInput, MainOutput> {
 
@@ -178,6 +186,7 @@ class MainActivity : ComponentActivity(), ScreenView<MainInput, MainOutput> {
     override fun inputs(): Flow<MainInput> = inputChannel
 }
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun Content(output: MainOutput.Display, inputChannel: MutableSharedFlow<MainInput>) {
     Column {
@@ -195,6 +204,50 @@ fun Content(output: MainOutput.Display, inputChannel: MutableSharedFlow<MainInpu
             }
             Text(text = output.counter.toString())
         }
+
+        val coroutineScope = rememberCoroutineScope()
+        val pagerState = rememberPagerState()
+
+
+        TabRow(
+            // Our selected tab is our current page
+            selectedTabIndex = pagerState.currentPage,
+            // Override the indicator, using the provided pagerTabIndicatorOffset modifier
+            indicator = { tabPositions ->
+                TabRowDefaults.Indicator(
+                    Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+                )
+            }
+        ) {
+            // Add tabs for all of our pages
+            listOf("asd", "asdas", "hgjh", "dggfd", "dsfsdf").forEachIndexed { index, title ->
+                Tab(
+                    text = { Text(title) },
+                    selected = pagerState.currentPage == index,
+                    onClick = {
+                        coroutineScope.launch {
+                            pagerState.animateScrollToPage(index)
+                        }
+                    },
+                )
+            }
+        }
+
+        HorizontalPager(count = 5, state = pagerState) { page ->
+            // Our page content
+            Text(
+                text = "Page: $page",
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        HorizontalPagerIndicator(
+            pagerState = pagerState,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(16.dp),
+        )
+
         when (val current = output.moviesState) {
             is MovieState.Display -> {
                 LazyColumn {
