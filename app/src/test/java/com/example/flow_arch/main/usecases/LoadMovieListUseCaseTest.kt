@@ -3,9 +3,9 @@ package com.example.flow_arch.main.usecases
 import app.cash.turbine.test
 import com.example.flow_arch.common.network.Movie
 import com.example.flow_arch.common.repo.MovieRepository
+import com.example.flow_arch.main.arch.Movies
 import io.mockk.every
 import io.mockk.mockk
-import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.TestScope
@@ -19,23 +19,22 @@ class LoadMovieListUseCaseTest {
 
     private val useCase = LoadMovieListUseCase(movieRepo)
 
-    @ExperimentalTime
     @Test
     fun `test nominal case`() = TestScope().runTest {
-        every { movieRepo.getMovieList() } returns flowOf(listOf(Movie(OVERVIEW, IMAGE, TITLE)))
+        every { movieRepo.getMovieList(1) } returns flowOf(listOf(Movie(OVERVIEW, IMAGE, TITLE)))
 
-        flowOf(Action.InitialAction)
+        flowOf(Action.LoadPage(1))
             .let(useCase())
             .test {
                 assertEquals(Result.UiUpdate.MovieList.Loading, awaitItem())
                 assertEquals(
                     Result.UiUpdate.MovieList.Display(
                         listOf(
-                            Movie(
+                            Movies.Display(Movie(
                                 OVERVIEW,
                                 IMAGE,
                                 TITLE
-                            )
+                            ))
                         )
                     ), awaitItem()
                 )
@@ -43,12 +42,11 @@ class LoadMovieListUseCaseTest {
             }
     }
 
-    @ExperimentalTime
     @Test
     fun `test error case`() = TestScope().runTest {
-        every { movieRepo.getMovieList() } returns flow { throw Exception() }
+        every { movieRepo.getMovieList(1) } returns flow { throw Exception() }
 
-        flowOf(Action.InitialAction)
+        flowOf(Action.LoadPage(1))
             .let(useCase())
             .test {
                 assertEquals(Result.UiUpdate.MovieList.Loading, awaitItem())
