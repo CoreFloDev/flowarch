@@ -6,10 +6,12 @@ import com.example.flow_arch.common.network.MovieApiImplementation
 import com.example.flow_arch.common.repo.MovieRepository
 import dagger.Module
 import dagger.Provides
-import io.ktor.client.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.ContentNegotiation
+import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.request.accept
+import io.ktor.http.ContentType
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 
 @Module
@@ -22,13 +24,13 @@ class AppModule(private val context: Context) {
     @Provides
     @AppScope
     fun provideHttpClient() = HttpClient {
-        // Json
-        install(JsonFeature) {
-            serializer = KotlinxSerializer(json)
+        install(DefaultRequest) {
             accept(ContentType.Application.Json)
-            charset("utf-8")
         }
-
+        // Json
+        install(ContentNegotiation) {
+            json(json)
+        }
     }
 
     private val json = Json {
